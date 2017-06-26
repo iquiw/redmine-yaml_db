@@ -12,9 +12,6 @@ def docker_copyto(container, srcfile, dstdir):
 
     return container.put_archive(data = tarstream, path = dstdir)
 
-def create_network(client):
-    return client.networks.create('redmine-yaml_db', driver = 'bridge')
-
 def run_mysql(client):
     client.images.build(path = 'mysql', tag = 'redmine-yaml_db-mysql')
 
@@ -22,29 +19,27 @@ def run_mysql(client):
                                       detach = True,
                                       environment = ['MYSQL_ALLOW_EMPTY_PASSWORD=yes',
                                                      'MYSQL_USER=redmine',
-                                                     'MYSQL_PASSWORD=redmine'],
-                                      network = 'redmine-yaml_db')
-    print(container)
-    container.exec_run('sh /init-redmine.sh')
+                                                     'MYSQL_PASSWORD=redmine'])
+    out = container.exec_run('sh /init-redmine.sh')
+    print(out)
     return container
 
 def run_redmine(client, mysql):
     client.images.build(path = 'redmine', tag = 'redmine-yaml_db-redmine')
 
     container = client.containers.run('redmine-yaml_db-redmine',
-                                      command  = 'rake db:data:dump; sleep 600',
-                                      detach = True,
-                                      environment = ['REDMINE_DB_MYSQL=db',
+                                      command  = '-c "/docker-entrypoint.sh rake db:dump; sleep 600"',
+                                      environment = ['REDMINE_DB_MYSQL=' + mysql.name,
                                                      'REDMINE_DB_USERNAME=redmine',
                                                      'REDMINE_DB_PASSWORD=redmine'],
-                                      network = 'redmine-yaml_db',
-                                      links = {
-                                          container.name: 'db'
-                                      })
-
+                                      entrypoint = '/bin/sh',
+                                      links = [(mysql.name, 'db')])
     return container
 
 client = docker.from_env()
-network = create_network(client)
 mysql = run_mysql(client)
-run_redmine(client, mysql)
+print(mysql)
+redmine = run_redmine(client, mysql)
+print(redmine)
+mysql.stop()
+mysql.remove()

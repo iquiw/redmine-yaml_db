@@ -9,5 +9,5 @@ done
 set -e
 
 mysqladmin -u root create redmine
-
 mysql -u root redmine < /redmine.sql
+mysql -u root -e "GRANT ALL ON redmine.* TO 'redmine'@'%'"

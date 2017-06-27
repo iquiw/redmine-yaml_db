@@ -31,22 +31,25 @@ def run_mysql(client):
 
     return container
 
-def run_redmine(client, mysql):
+def run_redmine(client, mysql, volume):
     client.images.build(path = 'redmine', tag = 'redmine-yaml_db-redmine')
 
-    container = client.containers.run('redmine-yaml_db-redmine',
-                                      command  = '-c "/docker-entrypoint.sh rake db:dump; sleep 600"',
-                                      environment = ['REDMINE_DB_MYSQL=' + mysql.name,
-                                                     'REDMINE_DB_USERNAME=redmine',
-                                                     'REDMINE_DB_PASSWORD=redmine'],
-                                      entrypoint = '/bin/sh',
-                                      links = [(mysql.name, 'db')])
-    return container
+    client.containers.run('redmine-yaml_db-redmine',
+                          command  = '/dump.sh',
+                          environment = ['REDMINE_DB_MYSQL=' + mysql.name,
+                                         'REDMINE_DB_USERNAME=redmine',
+                                         'REDMINE_DB_PASSWORD=redmine'],
+                          entrypoint = '/bin/sh',
+                          links = [(mysql.name, 'db')],
+                          remove = True,
+                          volumes = { volume.name: { 'bind': '/data', 'mode': 'rw' }})
 
 client = docker.from_env()
+
+volume = client.volumes.create('redmine-yaml_db-data')
 mysql = run_mysql(client)
-print(mysql)
-redmine = run_redmine(client, mysql)
-print(redmine)
+print('Created MySQL container: {0}'.format(mysql.short_id))
+run_redmine(client, mysql, volume)
+print('DB dumped to {0}'.format(volume.name))
 mysql.stop()
 mysql.remove()

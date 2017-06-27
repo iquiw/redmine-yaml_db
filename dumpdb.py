@@ -18,10 +18,17 @@ def run_mysql(client):
     container = client.containers.run('redmine-yaml_db-mysql',
                                       detach = True,
                                       environment = ['MYSQL_ALLOW_EMPTY_PASSWORD=yes',
+                                                     'MYSQL_DATABASE=redmine',
                                                      'MYSQL_USER=redmine',
                                                      'MYSQL_PASSWORD=redmine'])
-    out = container.exec_run('sh /init-redmine.sh')
-    print(out)
+
+    ready = 0
+    for line in container.logs(stdout = False, stderr = True, stream = True):
+        if 'redmine.sql' in line or 'ready for connections' in line:
+            ready += 1
+        if ready >= 2:
+            break
+
     return container
 
 def run_redmine(client, mysql):

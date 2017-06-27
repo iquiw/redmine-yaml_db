@@ -1,6 +1,4 @@
 FROM mysql:5.7
 
-COPY charset.cnf     /etc/mysql/conf.d/
-
-COPY init-redmine.sh /init-redmine.sh
-COPY redmine.sql     /
+COPY my.cnf      /etc/mysql/conf.d/
+COPY redmine.sql /docker-entrypoint-initdb.d/

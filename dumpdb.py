@@ -13,7 +13,7 @@ def docker_copyto(container, srcfile, dstdir):
     return container.put_archive(data = tarstream, path = dstdir)
 
 def run_mysql(client):
-    client.images.build(path = 'mysql', tag = 'redmine-yaml_db-mysql')
+    client.images.build(path = 'mysql', rm = True, tag = 'redmine-yaml_db-mysql')
 
     container = client.containers.run('redmine-yaml_db-mysql',
                                       detach = True,
@@ -32,7 +32,7 @@ def run_mysql(client):
     return container
 
 def run_redmine(client, mysql, volume):
-    client.images.build(path = 'redmine', tag = 'redmine-yaml_db-redmine')
+    client.images.build(path = 'redmine', rm = True, tag = 'redmine-yaml_db-redmine')
 
     client.containers.run('redmine-yaml_db-redmine',
                           command  = '/dump.sh',

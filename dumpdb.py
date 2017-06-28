@@ -24,7 +24,7 @@ def run_mysql(client):
 
     ready = 0
     for line in container.logs(stdout = False, stderr = True, stream = True):
-        if 'redmine.sql' in line or 'ready for connections' in line:
+        if b'redmine.sql' in line or b'ready for connections' in line:
             ready += 1
         if ready >= 2:
             break

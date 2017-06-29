@@ -18,10 +18,18 @@ class Redmine:
             remove = True,
             volumes = { volume.name: { 'bind': '/data', 'mode': 'rw' }})
 
-    def dump(self, mysql, volume):
+    def dump_yaml(self, mysql, volume):
         self.__run('/dump.sh',
                    [ 'REDMINE_DB_MYSQL=' + mysql.container.name,
                      'REDMINE_DB_USERNAME=redmine',
                      'REDMINE_DB_PASSWORD=redmine' ],
                    mysql.container.name,
+                   volume)
+
+    def load_yaml(self, postgres, volume):
+        self.__run('/load.sh',
+                   [ 'REDMINE_DB_POSTGRES=' + postgres.container.name,
+                     'REDMINE_DB_USERNAME=redmine',
+                     'REDMINE_DB_PASSWORD=redmine' ],
+                   postgres.container.name,
                    volume)

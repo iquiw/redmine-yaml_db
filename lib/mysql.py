@@ -12,7 +12,7 @@ class MySQL:
     def __build(self):
         self.client.images.build(path = 'mysql', rm = True, tag = MySQL.__name)
 
-    def load(self):
+    def load_db(self):
         self.container = self.client.containers.run(MySQL.__name,
                                                     detach = True,
                                                     environment = MySQL.__envs)

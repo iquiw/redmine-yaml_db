@@ -1,8 +1,14 @@
 import docker
+from pathlib import Path
 
 from lib.mysql import MySQL
 from lib.postgres import Postgres
 from lib.redmine import Redmine
+
+sql_file = Path('mysql/redmine.sql')
+if not sql_file.exists():
+    print('Please put SQL file: {0}'.format(str(sql_file)))
+    exit(1)
 
 client = docker.from_env()
 

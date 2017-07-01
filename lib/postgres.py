@@ -12,6 +12,14 @@ class Postgres:
                                                     detach = True,
                                                     environment = Postgres.__envs)
 
+    def dump_db(self, sqlfile):
+        out = self.container.exec_run('pg_dump -U redmine redmine',
+                                      stderr = False,
+                                      stream = True)
+        with open(sqlfile, 'wb') as f:
+            for b in out:
+                f.write(b)
+
     def release(self):
         self.container.stop()
         self.container.remove()

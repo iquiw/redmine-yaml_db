@@ -1,5 +1,4 @@
 import docker
-from pathlib import Path
 import sys
 
 from lib.mysql import MySQL

@@ -26,8 +26,8 @@ class MySQL:
             if ready >= 2:
                 break
 
-        utils.docker_copyto(self.container, sqlfile, '/tmp/')
-        out = self.container.exec_run('mysql -u root redmine -e "source /tmp/redmine.sql"', tty = True)
+        utils.docker_copyto(self.container, sqlfile, '/tmp/redmine.sql')
+        out = self.container.exec_run('mysql -u root -e "source /tmp/redmine.sql" redmine')
         if len(out) > 0:
             print(out)
 

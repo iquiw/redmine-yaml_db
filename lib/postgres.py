@@ -1,5 +1,5 @@
 class Postgres:
-    __name = 'postgres:9.6'
+    __name = 'iquiw/pgroonga-on-postgres:latest'
     __envs = [ 'POSTGRES_DB=redmine',
                'POSTGRES_USER=redmine',
                'POSTGRES_PASSWORD=redmine' ]

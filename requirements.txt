@@ -12,5 +12,5 @@ pyparsing==2.2.0
 python-dotenv==0.6.4
 requests==2.32.4
 six==1.10.0
-urllib3==1.26.19
+urllib3==2.5.0
 websocket-client==0.44.0
